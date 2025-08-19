@@ -1,3 +1,67 @@
+libxslt (1.1.43-0.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add changelog entries for 1.1.35-1.1, 1.1.35-1.2 and 1.1.35-2.
+  * Fix maintainer address.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 18 Aug 2025 10:05:12 +0200
+
+libxslt (1.1.43-0.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * CVE-2025-7424: libxslt: Type confusion in xmlNode.psvi between
+    stylesheet and source nodes.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 13 Aug 2025 11:52:50 +0200
+
+libxslt (1.1.43-0exp1) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * New upstream version.
+  * Explicitly configure with --with-crypto.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 20 May 2025 07:46:42 +0200
+
+libxslt (1.1.39-0exp1) experimental; urgency=medium
+
+  * New upstream version 1.1.39
+  * Drop patch merged upstream, update other ones
+  * Update std-ver to 3.6.2, no change required
+  * Override source-is-missing lintian warning
+  * d/rules: install README.md
+  * d/rules: remove override_dh_installchangelogs
+  * Update documentation files and doc-base registration
+  * d/control: replace pkg-config with pkgconf
+
+ -- Aron Xu <aron@debian.org>  Wed, 28 Feb 2024 15:26:07 +0800
+
+libxslt (1.1.35-2) unstable; urgency=medium
+
+  * Fix information disclosure with improved memory handling of generated-id()
+    (Closes: #1108074, CVE-2023-40403)
+  * Fix type confusion in xmlNode.psvi between stylesheet and source nodes
+    (Closes: #1109123, CVE-2025-7424)
+  * debian/control: replace pkg-config with pkgconf
+
+ -- Aron Xu <aron@debian.org>  Wed, 13 Aug 2025 19:12:53 +0800
+
+libxslt (1.1.35-1.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix UAF related to excluded namespaces (CVE-2024-55549) (Closes: #1100565)
+  * Fix use-after-free of XPath context node (CVE-2025-24855)
+    (Closes: #1100566)
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Sat, 15 Mar 2025 14:03:26 +0100
+
+libxslt (1.1.35-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add missing #include <stdlib.h> to fix FTFBS. Closes: #1073312
+  * Use pkg-config to locate libgcrypt. Closes: #1071937
+
+ -- Andreas Metzler <ametzler@debian.org>  Tue, 09 Jul 2024 13:56:17 +0200
+
 libxslt (1.1.35-1) unstable; urgency=medium
 
   * Team upload.
