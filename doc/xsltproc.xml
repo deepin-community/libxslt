@@ -25,8 +25,6 @@
 			</address>
 		</affiliation>
 	</author>
-	<!-- date should be the date of the latest change or the release version -->
-	<date>$Date$</date>
 	<!-- still a bit buggy output, will talk to docbook-xsl upstream to fix this -->
 	<!-- <releaseinfo>This is release 0.4 of the xsltproc Manual.</releaseinfo> -->
 	<!-- <edition>0.4</edition> -->
@@ -71,7 +69,6 @@
 			<arg choice="plain"><option>--noout</option></arg>
 			<arg choice="plain"><option>--maxdepth <replaceable class="option">VALUE</replaceable></option></arg>
 			<arg choice="plain"><option>--maxvars <replaceable class="option">VALUE</replaceable></option></arg>
-			<arg choice="plain"><option>--maxparserdepth <replaceable class="option">VALUE</replaceable></option></arg>
 			<arg choice="plain"><option>--huge</option></arg>
 			<arg choice="plain"><option>--seed-rand <replaceable class="option">VALUE</replaceable></option></arg>
 			<arg choice="plain"><option>--html</option></arg>
@@ -217,13 +214,6 @@
 			<term><option>--maxvars <replaceable>VALUE</replaceable></option></term>
 			<listitem>
 				<para>Maximum number of variables. The default is 15000.</para>
-			</listitem>
-		</varlistentry>
-
-		<varlistentry>
-			<term><option>--maxparserdepth <replaceable>VALUE</replaceable></option></term>
-			<listitem>
-				<para>Maximum element nesting level of parsed XML documents. The default is 256.</para>
 			</listitem>
 		</varlistentry>
 

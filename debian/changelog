@@ -1,3 +1,50 @@
+libxslt (1.1.43-0.3) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * CVE-2025-11731: End function node ancestor search at document,
+    taken from the trunk.
+  * CVE-2025-10911: Proposed patch, taken from
+    https://gitlab.gnome.org/GNOME/libxslt/-/merge_requests/77.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 24 Oct 2025 19:05:05 +0200
+
+libxslt (1.1.43-0.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add changelog entries for 1.1.35-1.1, 1.1.35-1.2 and 1.1.35-2.
+  * Fix maintainer address.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 18 Aug 2025 10:05:12 +0200
+
+libxslt (1.1.43-0.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * CVE-2025-7424: libxslt: Type confusion in xmlNode.psvi between
+    stylesheet and source nodes.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 13 Aug 2025 11:52:50 +0200
+
+libxslt (1.1.43-0exp1) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * New upstream version.
+  * Explicitly configure with --with-crypto.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 20 May 2025 07:46:42 +0200
+
+libxslt (1.1.39-0exp1) experimental; urgency=medium
+
+  * New upstream version 1.1.39
+  * Drop patch merged upstream, update other ones
+  * Update std-ver to 3.6.2, no change required
+  * Override source-is-missing lintian warning
+  * d/rules: install README.md
+  * d/rules: remove override_dh_installchangelogs
+  * Update documentation files and doc-base registration
+  * d/control: replace pkg-config with pkgconf
+
+ -- Aron Xu <aron@debian.org>  Wed, 28 Feb 2024 15:26:07 +0800
+
 libxslt (1.1.35-2) unstable; urgency=medium
 
   * Fix information disclosure with improved memory handling of generated-id()

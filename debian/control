@@ -9,11 +9,11 @@ Build-Depends:
  debhelper-compat (= 12),
  docbook-xsl,
  libgcrypt20-dev,
- libxml2-dev (>= 2.6.27),
+ libxml2-dev (>= 2.14),
  perl:any,
  pkgconf,
  rename,
-Standards-Version: 4.5.0
+Standards-Version: 4.6.2
 Rules-Requires-Root: no
 Homepage: https://gitlab.gnome.org/GNOME/libxslt/-/wikis/home
 Vcs-Browser: https://salsa.debian.org/xml-sgml-team/libxslt
@@ -44,7 +44,7 @@ Multi-Arch: same
 Provides:
  libxslt-dev,
 Depends:
- libxml2-dev (>= 2.6.26),
+ libxml2-dev (>= 2.14),
  libxslt1.1 (= ${binary:Version}),
  ${misc:Depends},
 Description: XSLT 1.0 processing library - development kit

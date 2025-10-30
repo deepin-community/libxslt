@@ -1,6 +1,7 @@
 #include "libxml_wrap.h"
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
+#include <libxslt/xsltlocale.h>
 #include <libxslt/xsltutils.h>
 #include <libxslt/attributes.h>
 #include <libxslt/documents.h>
@@ -17,6 +18,12 @@
 #include <libxslt/transform.h>
 #include <libxslt/variables.h>
 #include <libxslt/xsltconfig.h>
+
+#ifdef __GNUC__
+#define ATTRIBUTE_UNUSED __attribute__((unused))
+#else
+#define ATTRIBUTE_UNUSED
+#endif
 
 #define Pystylesheet_Get(v) (((v) == Py_None) ? NULL : \
         (((Pystylesheet_Object *)(v))->obj))
