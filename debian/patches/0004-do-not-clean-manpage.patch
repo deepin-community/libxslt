@@ -9,17 +9,25 @@ Forwarded: no
  doc/Makefile.am | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
---- a/doc/Makefile.am
-+++ b/doc/Makefile.am
-@@ -246,9 +246,9 @@
- 	-@($(XSLTPROC) --nonet -o $@ http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl xsltproc.xml)
+Index: libxslt/doc/Makefile.am
+===================================================================
+--- libxslt.orig/doc/Makefile.am
++++ libxslt/doc/Makefile.am
+@@ -32,12 +32,14 @@ EXTRA_DIST =				\
+ 	tutorial2/libxslt_pipes.xml	\
+ 	xsltproc.xml
  
- xsltproc.1: $(srcdir)/xsltproc.xml
--	-@(if [ -x $(XSLTPROC) ] ; then \
-+	(if [ -x $(srcdir)/../xsltproc/xsltproc ] && [ -f /usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl ] ; then \
- 	   echo "Rebuilding the man pages from the xml" ; \
--	   $(XSLTPROC) --nonet $(srcdir)/xsltproc.xml ; fi)
-+	   $(srcdir)/../xsltproc/xsltproc --nonet /usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl $(srcdir)/xsltproc.xml ; fi)
+-DOCBOOK_HTML = http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl
++DOCBOOK_HTML = /usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl
  
- # Note that in the following, xmllint output is piped to xsltproc
- search.php: $(srcdir)/api.xsl $(srcdir)/site.xsl $(srcdir)/search.templ \
+ rebuild:
+ 	cd $(srcdir) && ./apibuild.py
+-	cd $(srcdir) && $(XSLTPROC) --nonet xsltproc.xml
+-	cd $(srcdir) && $(XSLTPROC) --nonet -o xsltproc.html $(DOCBOOK_HTML) xsltproc.xml
++	(if [ -x $(srcdir)/../xsltproc/xsltproc ] ; then \
++		cd $(srcdir) && $(srcdir)/../xsltproc/xsltproc --nonet xsltproc.xml; \
++		cd $(srcdir) && $(srcdir)/../xsltproc/xsltproc --nonet -o xsltproc.html $(DOCBOOK_HTML) xsltproc.xml; \
++	fi)
+ 	cd devhelp && $(MAKE) rebuild
+ 	cd EXSLT/devhelp && $(MAKE) rebuild
+ 

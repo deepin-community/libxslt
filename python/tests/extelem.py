@@ -1,6 +1,7 @@
-#!/usr/bin/python -u
+#!/usr/bin/env python
 import sys
 import string
+import setup_test
 import libxml2
 # Memory debug specific
 libxml2.debugMemory(1)
@@ -18,7 +19,7 @@ def transform_test(ctx, node, inst, comp):
     global insertNodeName
 
     #
-    # Small check to verify the context is correcly accessed
+    # Small check to verify the context is correctly accessed
     #
     try:
         #
