@@ -51,14 +51,11 @@ __inline int c99_vsnprintf(char *outBuf, size_t size, const char *format, va_lis
 #define vsnprintf trio_vsnprintf
 #endif
 
-/* #define DEBUG */
-/* #define DEBUG_XPATH */
-/* #define DEBUG_ERROR */
-/* #define DEBUG_MEMORY */
-/* #define DEBUG_EXTENSIONS */
-/* #define DEBUG_EXTENSIONS */
-
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit_libxsltmod(void);
+#else
 void initlibxsltmod(void);
+#endif
 
 /************************************************************************
  *									*
@@ -299,7 +296,7 @@ libxslt_xsltElementPreCompCallback(xsltStylesheetPtr style, xmlNodePtr inst,
 	    pyobj_element_f);
 
     Py_INCREF(pyobj_precomp_f); /* Protect refcount against reentrant manipulation of callback hash */
-    result = PyEval_CallObject(pyobj_precomp_f, args);
+    result = PyObject_CallObject(pyobj_precomp_f, args);
     Py_DECREF(pyobj_precomp_f);
     Py_DECREF(args);
 
@@ -357,7 +354,7 @@ libxslt_xsltElementTransformCallback(xsltTransformContextPtr ctxt,
 	libxslt_xsltElemPreCompPtrWrap(comp));
 
     Py_INCREF(func); /* Protect refcount against reentrant manipulation of callback hash */
-    result = PyEval_CallObject(func, args);
+    result = PyObject_CallObject(func, args);
     Py_DECREF(func);
     Py_DECREF(args);
 
@@ -468,7 +465,7 @@ libxslt_xmlXPathFuncCallback(xmlXPathParserContextPtr ctxt, int nargs) {
     }
 
     Py_INCREF(current_function);
-    result = PyEval_CallObject(current_function, list);
+    result = PyObject_CallObject(current_function, list);
     Py_DECREF(current_function);
     Py_DECREF(list);
 
@@ -623,7 +620,8 @@ libxslt_xsltSetLoaderFunc(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 }
 
 PyObject *
-libxslt_xsltGetLoaderFunc(void) {
+libxslt_xsltGetLoaderFunc(PyObject *self ATTRIBUTE_UNUSED,
+	                  PyObject *args ATTRIBUTE_UNUSED) {
     PyObject *py_retval;
 
     py_retval = pythonDocLoaderObject;
@@ -687,7 +685,7 @@ libxslt_xsltApplyStylesheetUser(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     PyObject *pyobj_transformCtxt;
     const char **params = NULL;
     int len = 0, i, j;
-    ssize_t ppos = 0;
+    Py_ssize_t ppos = 0;
     PyObject *name;
     PyObject *value;
 
@@ -775,7 +773,7 @@ libxslt_xsltApplyStylesheet(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     PyObject *pyobj_params;
     const char **params = NULL;
     int len = 0, i, j, params_size;
-    ssize_t ppos = 0;
+    Py_ssize_t ppos = 0;
     PyObject *name;
     PyObject *value;
 
@@ -871,7 +869,7 @@ libxslt_xsltSaveResultToString(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) 
     /* FIXME: We should probably add more restrictive error checking
      * and raise an error instead of "just" returning NULL.
      * FIXME: Documentation and code for xsltSaveResultToString diff
-     * -> emmitted will never be positive non-null.
+     * -> emitted will never be positive non-null.
      */
     emitted = xsltSaveResultToString(&buffer, &size, result, style);
     if(!buffer || emitted < 0)
@@ -961,7 +959,7 @@ libxslt_xsltErrorFuncHandler(void *ctx ATTRIBUTE_UNUSED, const char *msg,
         Py_XINCREF(libxslt_xsltPythonErrorFuncCtxt);
         message = libxml_charPtrWrap(str);
         PyTuple_SetItem(list, 1, message);
-        result = PyEval_CallObject(libxslt_xsltPythonErrorFuncHandler, list);
+        result = PyObject_CallObject(libxslt_xsltPythonErrorFuncHandler, list);
         Py_XDECREF(list);
         Py_XDECREF(result);
     }
@@ -1229,9 +1227,9 @@ static PyMethodDef libxsltMethods[] = {
 
 #ifdef MERGED_MODULES
 #if PY_MAJOR_VERSION >= 3
-extern PyObject*  PyInit_libxml2mod(void);
+PyMODINIT_FUNC PyInit_libxml2mod(void);
 #else
-extern void initlibxml2mod(void);
+void initlibxml2mod(void);
 #endif
 #endif
 
@@ -1254,7 +1252,7 @@ static struct PyModuleDef moduledef = {
 #endif
 
 #if PY_MAJOR_VERSION >= 3
-PyObject* PyInit_libxsltmod(void){
+PyMODINIT_FUNC PyInit_libxsltmod(void){
 #else
 void initlibxsltmod(void) {
 #endif
@@ -1279,9 +1277,6 @@ void initlibxsltmod(void) {
      * Specific XSLT initializations
      */
     libxslt_xsltErrorInitialize();
-    xmlInitMemory();
-    xmlLoadExtDtdDefaultValue = XML_DETECT_IDS | XML_COMPLETE_ATTRS;
-    xmlDefaultSAXHandler.cdataBlock = NULL;
     /*
      * Register the EXSLT extensions and the test module
      */

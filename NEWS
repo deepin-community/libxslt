@@ -1,10 +1,346 @@
+NEWS file for libxslt
 
-        NEWS file for libxslt
+v1.1.43: Mar 12 2025
 
-See the git page at 
-https://gitlab.gnome.org/GNOME/libxslt
+### Major changes
 
-to get a description of the recent commits.
+The non-standard EXSLT crypto extensions and support for dynamically
+loaded plugins are now disabled by default. These features can be
+enabled by passing --with-crypto or --with-plugins to configure.
+In a future release, these features will be removed.
+
+Debug output and the debugger are disabled by default and can be
+enabled by passing --with-debug or --with-debugger.
+
+### Security
+
+- [CVE-2025-24855] Fix use-after-free of XPath context node
+- [CVE-2024-55549] Fix UAF related to excluded namespaces
+
+### Bug fixes
+
+- variables: Fix non-deterministic generated IDs
+
+### libxml2 related cleanup
+
+- python: Don't use removed libxml2 macro
+- tests: Skip test_bad.xsl with libxml2 before 2.13
+- python: Don't include nanoftp.h and nanohttp.h
+- tests: Avoid namespace warning on Windows
+- numbers: Stop using libxml2 XPath axis API
+- numbers: Use private copy of xmlCopyCharMultiByte
+- documents: Use xmlCtxtParseDocument if available
+- tests: Make runtest compile with older libxml2 versions
+- utils: Account for libxml2 change
+- tests: Make bug-219.xsl compatible with older libxml2
+- extensions: always include stdlib.h (Hugo BeauzÃ©e-Luyssen)
+- extensions: Don't use libxml2's "modules" feature
+
+### Code cleanup
+
+- numbers: Make static variables const
+- variables: Remove debug code
+
+### Portability
+
+- python: Declare init func with PyMODINIT_FUNC
+- exslt: Use C99 NAN macro
+
+### Build
+
+- cmake: Always build Python module as shared library
+- cmake: Fix compatibility in package version file
+- configure.ac: Find libgcrypt via pkg-config (Alessandro Astone)
+
+
+v1.1.42: Jul 4 2024
+
+### Regressions
+
+- extensions: Readd call to xmlCheckFilename with older libxml2
+
+### Improvmenets
+
+- utils: Don't use deprecated xmlCharEncodingHandler member
+- transform: Handle filesystem paths after libxml2 changes
+- locale: Work around issue with FreeBSD's strxfrm_l
+
+### Build systems
+
+- cmake: Add LIBXSLT_WITH_PROGRAMS option (Don Olmstead)
+- cmake: Fix HAVE_GCRYPT check
+
+
+v1.1.41: Jun 19 2024
+
+### Removals
+
+- autotools: Stop installing libxslt.m4
+- autotools: Remove RPM build
+
+### Improvements
+
+- libxslt: Set _FILE_OFFSET_BITS to 64
+- xsltproc: Remove unneeded includes
+- include: Don't define ATTRIBUTE_UNUSED in public header
+- xsltproc: Make "-" read from stdin
+
+### Build systems
+
+- cmake: Adjust paths for UNIX or UNIX-like target systems (Daniel E)
+
+### Tests
+
+- cmake: Link testplugin with libxml2
+- tests: Link testplugin with libxml2
+- tests: Fix expected error after libxml2 change
+- runtest: Switch to xmlFormatError
+- fuzz: Avoid accessing internal struct members
+
+
+v1.1.40: Jun 12 2024
+
+### Removals
+
+- xsltproc: remove maxparserdepth option (Mike Dalessio)
+
+### Improvements
+
+- functions: xmlXPtrNewContext is deprecated
+- xsltproc: Stop calling xmlMemoryDump
+- xsltproc: Prefer XML_PARSE_NONET over xmlNoNetEntityLoader
+- functions: Fix build if libxml2 modules are disabled
+- extensions: Don't call deprecated xmlCheckFilename
+- documents: Don't set ctxt->directory
+- exslt: Fix EXSLT functions without parameters
+
+### Build systems
+
+- build: Remove mem-debug option
+
+
+v1.1.39: Nov 16 2023
+
+### Bug fixes
+
+- extensions: Don't search imports for extension prefixes
+
+### Improvements
+
+- transform: Check maximum depth when processing default templates
+- build: Add more missing includes
+- python: Don't set deprecated global
+- build: Add missing includes
+- imports: Limit nesting depth
+- extensions: Report top-level elements in xsltDebugDumpExtensions
+- Add extern "C" { } block to xsltlocale.h (David Kilzer)
+
+### Portability
+
+- python: Make it compatible with python3.12 (Daniel Garcia Moreno)
+- date: Fix check for localtime_s
+- date: Fix check for gmtime_s
+
+### Build systems
+
+- pkg-config files include cflags for static builds (Mike Dalessio)
+- Handle NOCONFIG case when setting locations from CMake target properties (Markus
+  Rickert)
+- autotools: Make xslt-config executable
+
+### Tests
+
+- tests: Structured error handler now passes a const xmlError
+- python: Fix tests on MinGW
+- fuzz: Fix xmlFuzzEntityLoader after recent libxml2 changes
+
+
+v1.1.38: May 8 2023
+
+### Major changes
+
+About 40 memory errors in code paths handling malloc failures have been fixed.
+While these issues shouldn't impact security, this improves robustness under
+memory pressure.
+
+The result of generate-id() is now deterministic across multiple
+transformations fixing many issues with reproducible builds.
+
+Most of the test suite has been ported to C.
+
+### Bug fixes
+
+- Fix memory errors in code handling malloc failures
+- imports: Fix import/include cycle check
+- xsltlocale: Fix xsltNewLocale on macOS
+- Make xsl:sort thread-safe
+- Make generate-id() deterministic
+
+### Improvements
+
+- Stop using xmlStringCurrentChar
+- attributes.h needs to include xsltInternals.h (David Kilzer)
+- transform: Avoid null deref on documents without root node
+- numbers: Fix floating point overflows
+- date: Fix integer overflow in exsltDateFormatDuration
+- numbers: Fix harmless integer sign change
+- date: Add more overflow checks to formatting code (David Kilzer)
+- date: Fix rounding to make Windows tests pass
+- date: Rewrite duration and seconds formatting
+- xsltlocale: Make API platform-independent
+- Also accept application/xslt+xml media type in stylesheet PIs
+- warnings: Fix strict prototypes warning
+- xsltEvalUserParams() and xsltQuoteUserParams() are susceptible to integer
+  overflow when iterating through const char** array (David Kilzer)
+- xslt: Return NULL stylesheet on attribute set errors
+- xsltproc: Fix unused variable warning
+- xslt: Remove declaration for old libxml2
+- Fix various compiler warnings
+- Fix compiler warnings in xsltGenerateIdFunction
+- Disable Python bindings for debugger
+- Don't declare disabled functions
+- Migrate from PyEval_ to PyObject_
+
+### Build system
+
+- cmake: Use version script
+- autotools: Link with --undefined-version
+- win32: Remove broken libxslt.def.src
+- Stop updating version script
+- add support for Windows time functions (Rosen Penev)
+- cmake: link against libm on UNIX systems (Alex Richardson)
+- build: Add a distutils-based build system for the Python bits (Chun-wei Fan)
+- CMake: Relax check for Python 3.x support on Windows (Chun-wei Fan)
+- python/types.c: Fix building against older libxml2 (Chun-wei Fan)
+- python/libxslt.c: Replace ssize_t with Py_ssize_t (Chun-wei Fan)
+- cmake: Fix build with libxslt and libxml2 as subprojects
+- cmake: Set SOVERSION
+- cmake: Extract version from configure.ac
+- Fix classic Windows configuration for libexslt (Christoph M. Becker)
+- autotools: Fix Python tests in VPATH builds
+- autotools: Disable parallel Python build
+- autotools: Use AM_CFLAGS consistently
+- autotools: Link with -no-undefined
+- cmake: Fix Python installation
+- cmake: Don't check for Python 2
+- python: Don't output missing generators during build
+- python: Create .pyd on Windows
+- python: Fix build on Windows
+- python: Support Python 3 on Windows
+- cmake: Enable GCC compiler warnings
+- Update GCC compiler warnings
+
+### Tests
+
+- python: Remove temp file when running tests/basic.py
+- fuzz: Improve fuzzers
+- xsltlocale: Add test
+- gitlab-ci: Reenable MSan and LeakSanitizer
+- tests: Remove unused files
+- tests: Enable runtest.exe under MSVC
+- tests: Fix LIBXSLT_PLUGINS_PATH for multi-config CMake
+- tests: Remove unused leak statistics
+- tests: Skip some tests if iconv/ICU is disabled
+- gitlab-ci: Run Autotools tests with out-of-tree (VPATH) builds
+- tests: Port most of the test suite to C
+- tests: Fix out-of-tree Python tests
+- tests: Fix source directory for reports tests
+- gitlab-ci: Consolidate CMake test scripts
+- gitlab-ci: Only install cmake MinGW package if needed
+- gitlab-ci: Install 7-Zip using the .msi
+- gitlab-ci: Add CI job for MinGW/Autotools
+- gitlab-ci: Disable MSan for now
+- Run CI tests with -fsanitize=integer
+- Fix EXSLT functions tests when libxml2 is built --without-debug
+- Make CI tests exit on failure
+- Run Python 3 CI job with minimal configuration
+- Set library path when running Python tests
+
+### Documentation
+
+- doc: Remove unused cross-reference data
+- doc: Update apibuild.py
+
+
+v1.1.37: Aug 29 2022
+
+### Improvements
+
+- Don't use deprecated libxml2 macros
+- Don't mess with xmlDefaultSAXHandler
+
+### Build system
+
+- Require automake-1.16.3 or later
+- Remove generated files from distribution
+- Add missing compile definition for static builds to Autotools (Mike Dalessio)
+
+
+v1.1.36: Aug 17 2022
+
+### Removals and deprecations
+
+- Remove SVN keyword anchors
+- Remove CVS and SVN-related code
+- Remove README.cvs-commits
+- Remove ChangeLog
+- Remove xsltwin32config.h
+
+### Improvements
+
+- Simplify xsltexports.h and exsltexports.h
+- Don't overlink executables with gcrypt
+- Fix quadratic behavior with variables and parameters
+- Remove case labels with XPointer location types
+- Add configure~ to .gitignore
+- Stop calling deprecated libxml2 functions
+
+### Portability
+
+- Use portable python shebangs (David Seifert)
+- Remove useless __CYGWIN__ checks
+- Remove cruft from win32config.h
+- crypto.c: Silence a compiler warning on Windows (Chun-wei Fan)
+
+### Build system
+
+- Add missing compile definition for static builds to CMake
+- Avoid obsolescent `test -a` constructs (David Seifert)
+- Only link libxml2 statically in purely static build
+- Set AC_CONFIG_MACRO_DIR
+- Allow AM_MAINTAINER_MODE to be disabled
+- Streamline and fix documentation installation
+- Don't try to recreate COPYING symlink
+- Remove special configuration for certain maintainers
+- configure.ac: produce tar.xz only (GNOME policy) (David Seifert)
+- Detect libm using libtool's macros (David Seifert)
+- configure.ac: disable static libraries by default (David Seifert)
+- python/Makefile.am: nest python docs in $(docdir) (David Seifert)
+- python/Makefile.am: rely on global AM_INIT_AUTOMAKE (David Seifert)
+- configure.ac: remove useless AC_SUBST (David Seifert)
+- Use AM_PATH_PYTHON/PKG_CHECK_MODULES for python bindings (David Seifert)
+- Change libxml2 Python config
+- Don't check for standard C89 library functions
+- Don't check for standard C89 headers
+- Remove --with-html-dir option
+- Also check for glibtoolize in autogen.sh
+- Rework documentation build system
+- Remove old website
+- CMake: Relax check for enabling crypto support on Windows (Chun-wei Fan)
+- Remove obsolete AC_HEADER_STDC autoconf macro (Vadim Zeitlin)
+- Remove special configuration for old maintainers
+
+### Test suite, CI
+
+- Remove test involving XPointer range-to function
+- Test recursion in EXSLT dynamic functions
+- Add CI job for static build
+
+### Documentation
+
+- Move tutorial images
+
+
 v1.1.35: Feb 16 2022:
    - Security:
   [CVE-2021-30560] Fix use-after-free in xsltApplyTemplates
@@ -85,7 +421,7 @@ v1.1.34: Oct 30 2019:
   Regenerate web pages (Nick Wellnhofer),
   Fix Git link in news.html (Nick Wellnhofer),
   Minor documentation fixes after recent changes (Nick Wellnhofer),
-  Fix typos (Jan Pokorný),
+  Fix typos (Jan PokornÃ½),
   Regenerate symbols and API docs (Nick Wellnhofer),
   Regenerate EXSLT website (Nick Wellnhofer)
   
@@ -281,7 +617,7 @@ v1.1.30: Sep 04 2017:
   Add missing #include (Nick Wellnhofer),
   Adjust expected error messages in tests (Nick Wellnhofer),
   Make xsltDebug more quiet (Nick Wellnhofer),
-  New-line terminate error message that missed this convention (Jan Pokorný),
+  New-line terminate error message that missed this convention (Jan PokornÃ½),
   Use xmlBuffers in EXSLT string functions (Nick Wellnhofer),
   Switch to xmlUTF8Strsize in EXSLT string functions (Nick Wellnhofer),
   Check for return value of xmlUTF8Strlen (Nick Wellnhofer),
@@ -329,7 +665,7 @@ v1.1.30: Sep 04 2017:
   Add Python script to run some tests on Windows (Nick Wellnhofer),
   Remove /OPT:NOWIN98 option (Nick Wellnhofer),
   Visual Studio 14 CTP defines snprintf() (Daniel Veillard),
-  Use AC_PATH_TOOL to find libgcrypt-config and xml2-config (Micha¿ Górny),
+  Use AC_PATH_TOOL to find libgcrypt-config and xml2-config (MichaÂ¿ GÃ³rny),
   Use $libdir for LIBXSLT_DEFAULT_PLUGINS_PATH (larryhaja),
   Use mkdir macro also in case if mingw32. (Lars Kanis),
   Add math library to executable link flags (Nick Wellnhofer),
@@ -509,7 +845,7 @@ v1.1.30: Sep 04 2017:
     Various "make distcheck" and other fixes (Daniel Richard G),
     Fix portability to upcoming libxml2-2.9.0 (Daniel Veillard),
     Adding --system flag support to autogen.sh (Daniel Veillard),
-    Allow per-context override of xsltMaxDepth, introduce xsltMaxVars (Jérôme Carretero),
+    Allow per-context override of xsltMaxDepth, introduce xsltMaxVars (JÃ©rÃ´me Carretero),
     autogen.sh: Honor NOCONFIGURE environment variable (Colin Walters),
     configure: support silent automake rules if possible (Stefan Kost),
     Precompile patterns in xsl:number (Nick Wellnhofer),
@@ -832,7 +1168,7 @@ v1.1.30: Sep 04 2017:
 
 
 1.1.4: Feb 23 2004:
-   - bugfixes: attributes without doc (Mariano Suárez-Alvarez), problem with
+   - bugfixes: attributes without doc (Mariano SuÃ¡rez-Alvarez), problem with
     Yelp, extension problem
    - display extension modules (Steve Little)
    - Windows compilation patch (Mark Vadoc), Mingw (Mikhail Grushinskiy)
@@ -992,7 +1328,7 @@ This is a bugfix only release   - error message missing argument (William Brack)
 
 
 1.0.24: Jan 14 2003:
-   - bug fixes: imported global varables, python bindings (Stéphane Bidoul),
+   - bug fixes: imported global varables, python bindings (StÃ©phane Bidoul),
     EXSLT memory leak (Charles Bozeman), namespace generation on
     xsl:attribute, space handling with imports (Daniel Stodden),
     extension-element-prefixes (Josh Parsons), comments within xsl:text (Matt
@@ -1005,7 +1341,7 @@ This is a bugfix only release   - error message missing argument (William Brack)
    - fix the API generation scripts
    - API to provide the sorting routines (Richard Jinks)
    - added XML description of the EXSLT API
-   - added ESXLT URI (un)escaping (Jörg Walter)
+   - added ESXLT URI (un)escaping (JÃ¶rg Walter)
    - Some memory leaks have been found and fixed
    - document() now support fragment identifiers in URIs
 

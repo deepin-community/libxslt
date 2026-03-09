@@ -9,31 +9,22 @@
 #include "libxslt/libxslt.h"
 #include "libxslt/xsltconfig.h"
 #include "libexslt/exslt.h"
+
 #include <stdio.h>
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
+#include <stdlib.h>
+#include <stdarg.h>
+#include <time.h>
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
-#ifdef HAVE_TIME_H
-#include <time.h>
+#ifdef HAVE_SYS_TIMEB_H
+#include <sys/timeb.h>
 #endif
-#ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#ifdef HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
-#ifdef HAVE_STDARG_H
-#include <stdarg.h>
-#endif
-#if defined(_WIN32) && !defined(__CYGWIN__)
+#if defined(_WIN32)
 #include <fcntl.h>
 #endif
+
 #include <libxml/xmlmemory.h>
 #include <libxml/debugXML.h>
 #include <libxml/HTMLtree.h>
@@ -57,17 +48,13 @@
 
 #include <libexslt/exsltconfig.h>
 
-#if defined(HAVE_SYS_TIME_H)
-#include <sys/time.h>
-#elif defined(HAVE_TIME_H)
-#include <time.h>
+#ifndef STDIN_FILENO
+  #define STDIN_FILENO 0
 #endif
 
-#ifdef HAVE_SYS_TIMEB_H
-#include <sys/timeb.h>
-#endif
-
+#ifdef LIBXML_DEBUG_ENABLED
 static int debug = 0;
+#endif
 static int repeat = 0;
 static int timing = 0;
 static int dumpextensions = 0;
@@ -265,16 +252,13 @@ static void endTimer(const char *format, ...)
     msec *= 1000;
     msec += (endtime.tv_usec - begin.tv_usec) / 1000;
 
-#ifndef HAVE_STDARG_H
-#error "endTimer required stdarg functions"
-#endif
     va_start(ap, format);
     vfprintf(stderr,format,ap);
     va_end(ap);
 
     fprintf(stderr, " took %ld ms\n", msec);
 }
-#elif defined(HAVE_TIME_H)
+#else
 /*
  * No gettimeofday function, so we have to make do with calling clock.
  * This is obviously less accurate, but there's little we can do about
@@ -297,39 +281,10 @@ static void endTimer(const char *format, ...)
     endtime=clock();
     msec = ((endtime-begin) * 1000) / CLOCKS_PER_SEC;
 
-#ifndef HAVE_STDARG_H
-#error "endTimer required stdarg functions"
-#endif
     va_start(ap, format);
     vfprintf(stderr,format,ap);
     va_end(ap);
     fprintf(stderr, " took %ld ms\n", msec);
-}
-#else
-/*
- * We don't have a gettimeofday or time.h, so we just don't do timing
- */
-static void startTimer(void)
-{
-  /*
-   * Do nothing
-   */
-}
-static void endTimer(const char *format, ...)
-{
-  /*
-   * We cannot do anything because we don't have a timing function
-   */
-#ifdef HAVE_STDARG_H
-    va_start(ap, format);
-    vfprintf(stderr,format,ap);
-    va_end(ap);
-    fprintf(stderr, " was not timed\n");
-#else
-  /* We don't have gettimeofday, time or stdarg.h, what crazy world is
-   * this ?!
-   */
-#endif
 }
 #endif
 
@@ -354,6 +309,28 @@ xsltSubtreeCheck(xsltSecurityPrefsPtr sec ATTRIBUTE_UNUSED,
     if (ret == 0)
 	return(1);
     return(0);
+}
+
+static xmlDocPtr
+xsltReadFile(const char *filename) {
+    xmlDocPtr doc;
+
+#ifdef LIBXML_HTML_ENABLED
+    if (html) {
+        if (strcmp(filename, "-") == 0)
+            doc = htmlReadFd(STDIN_FILENO, "-", encoding, options);
+        else
+            doc = htmlReadFile(filename, encoding, options);
+    } else
+#endif
+    {
+        if (strcmp(filename, "-") == 0)
+            doc = xmlReadFd(STDIN_FILENO, "-", encoding, options);
+        else
+            doc = xmlReadFile(filename, encoding, options);
+    }
+
+    return(doc);
 }
 
 static void
@@ -393,12 +370,7 @@ xsltProcess(xmlDocPtr doc, xsltStylesheetPtr cur, const char *filename) {
 		res = xsltApplyStylesheet(cur, doc, params);
 		xmlFreeDoc(res);
 		xmlFreeDoc(doc);
-#ifdef LIBXML_HTML_ENABLED
-		if (html)
-		    doc = htmlReadFile(filename, encoding, options);
-		else
-#endif
-		    doc = xmlReadFile(filename, encoding, options);
+                doc = xsltReadFile(filename);
 	    }
 	}
 	ctxt = xsltNewTransformContext(cur, doc);
@@ -518,7 +490,6 @@ static void usage(const char *name) {
     printf("\t--noout: do not dump the result\n");
     printf("\t--maxdepth val : increase the maximum depth (default %d)\n", xsltMaxDepth);
     printf("\t--maxvars val : increase the maximum variables (default %d)\n", xsltMaxVars);
-    printf("\t--maxparserdepth val : increase the maximum parser depth\n");
     printf("\t--huge: relax any hardcoded limit from the parser\n");
     printf("\t             fixes \"parser error : internal error: Huge input lookup\"\n");
     printf("\t--seed-rand val : initialize pseudo random number generator with specific seed\n");
@@ -565,7 +536,6 @@ main(int argc, char **argv)
     }
 
     srand(time(NULL));
-    xmlInitMemory();
 
 #if defined(_WIN32) && !defined(__CYGINW__)
     setmode(fileno(stdout), O_BINARY);
@@ -655,7 +625,7 @@ main(int argc, char **argv)
             profile++;
         } else if ((!strcmp(argv[i], "-nonet")) ||
                    (!strcmp(argv[i], "--nonet"))) {
-	    defaultEntityLoader = xmlNoNetExternalEntityLoader;
+            options |= XML_PARSE_NONET;
         } else if ((!strcmp(argv[i], "-nowrite")) ||
                    (!strcmp(argv[i], "--nowrite"))) {
 	    xsltSetSecurityPrefs(sec, XSLT_SECPREF_WRITE_FILE,
@@ -763,20 +733,6 @@ main(int argc, char **argv)
                 if (value > 0)
                     xsltMaxVars = value;
             }
-        } else if ((!strcmp(argv[i], "-maxparserdepth")) ||
-                   (!strcmp(argv[i], "--maxparserdepth"))) {
-            int value;
-
-            i++;
-            if (i == argc) {
-                fprintf(stderr, "XML maxparserdepth value not specified!\n");
-                return (2);
-            }
-
-            if (sscanf(argv[i], "%d", &value) == 1) {
-                if (value > 0)
-                    xmlParserMaxDepth = value;
-            }
         } else if ((!strcmp(argv[i], "-huge")) ||
                    (!strcmp(argv[i], "--huge"))) {
             options |= XML_PARSE_HUGE;
@@ -823,10 +779,6 @@ main(int argc, char **argv)
             continue;
         } else if ((!strcmp(argv[i], "-maxvars")) ||
             (!strcmp(argv[i], "--maxvars"))) {
-            i++;
-            continue;
-        } else if ((!strcmp(argv[i], "-maxparserdepth")) ||
-            (!strcmp(argv[i], "--maxparserdepth"))) {
             i++;
             continue;
         } else if ((!strcmp(argv[i], "-seed-rand")) ||
@@ -919,12 +871,7 @@ main(int argc, char **argv)
 	    doc = NULL;
             if (timing)
                 startTimer();
-#ifdef LIBXML_HTML_ENABLED
-            if (html)
-                doc = htmlReadFile(argv[i], encoding, options);
-            else
-#endif
-                doc = xmlReadFile(argv[i], encoding, options);
+            doc = xsltReadFile(argv[i]);
             if (doc == NULL) {
                 fprintf(stderr, "unable to parse %s\n", argv[i]);
 		errorno = 6;
@@ -945,7 +892,6 @@ done:
     xsltFreeSecurityPrefs(sec);
     xsltCleanupGlobals();
     xmlCleanupParser();
-    xmlMemoryDump();
     return(errorno);
 }
 
