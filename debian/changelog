@@ -1,3 +1,15 @@
+libxslt (1.1.43-0.3deepin2) unstable; urgency=medium
+
+  * CVE-2025-7425: heap-use-after-free in xmlFreeID caused by `atype`
+    corruption. This CVE is mitigated by updating the libxml2-dev dependency
+    to >= 2.9.14, which includes the fix for this vulnerability.
+    The issue was introduced in libxslt v1.1.38 where xsltSetSourceNodeFlags
+    corrupts the atype field of attribute nodes, leading to use-after-free
+    when processing XSLT key() function on result tree fragments.
+    (Closes: #1109122)
+
+ -- deepin-ci-robot <packages@deepin.org>  Thu, 17 Apr 2026 04:58:00 +0800
+
 libxslt (1.1.43-0.3deepin1) unstable; urgency=medium
 
   * Non-maintainer upload.
