@@ -6,3 +6,5 @@
 gnome-libxslt-bug-139-apple-fix.diff
 fe508f201efb9ea37bfbe95413b8b28251497de3.diff
 77.diff
+CVE-2025-11731.patch
+CVE-2025-10911.patch
